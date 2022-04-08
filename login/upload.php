@@ -1,3 +1,5 @@
+<?php include('../base.php')?>
+
 <?php
 
 session_start();
@@ -22,8 +24,21 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
                         $tmp = $_FILES['file1']['tmp_name'];
                         if(move_uploaded_file($tmp, $path.$actual_image_name))
                             {
-                            //success upload
-                            shell_exec('addplay');
+                            shell_exec('find /etc/liquidsoap/music/'.$_SESSION["username"].' -name *.mp3 > /etc/liquidsoap/'.$_SESSION["username"].'.pls');
+                            $salida = shell_exec("cat /etc/liquidsoap/".$_SESSION["username"].".pls | awk -F'/' "."'{print".' $NF'."}'");
+
+                            $del = "delete from ".$_SESSION["username"];
+                            mysqli_query($conn,$del) or die("Algo ha ido mal en la consulta 0");
+
+                            $lines = explode("\n", $salida);
+                            foreach($lines as $line) {
+                                $sql = "insert into ".$_SESSION["username"]." (name) values ('$line')";
+                                $resultado = mysqli_query($conn,$sql) or die("Algo ha ido mal en la consulta 1");
+                            }
+
+                                $sql = "delete from ".$_SESSION["username"]." where name = ''";
+                                $resultado = mysqli_query($conn,$sql) or die("Algo ha ido mal en la consulta 1");
+
                             header("Location: upload_song.php");
                             }
                         else

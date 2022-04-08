@@ -82,14 +82,16 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 // Redirect to login page
 
                     // Crear carpeta en /etc/liquidsoap/music/$user
+                    shell_exec('touch /etc/liquidsoap/'.$username.'.pls');
                     shell_exec('mkdir /etc/liquidsoap/music/'.$username);
                     shell_exec('touch /etc/liquidsoap'.$username.'.liq');
+                    
                     $file = '/etc/liquidsoap/'.$username.'.liq';
                     $output = 'set("init.allow_root",true)
                     set("init.daemon.pidfile.path", "/etc/liquidsoap/daemon/pid.txt")
                     set("init.daemon",true)
                     %include "crossfade.liq"
-                    myplaylist = playlist(/etc/liquidsoap/'.$username.'.pls)
+                    myplaylist = playlist('.'"/etc/liquidsoap/'.$username.'.pls"'.')
                     security = single("/etc/liquidsoap/music/default.mp3")
                     radio = myplaylist
                     radio = normalize(radio)
@@ -100,23 +102,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     $fn = fopen($file,'w');
                     fwrite($fn,$output);
                     fclose($fn);
-                    shell_exec(' echo <listen-socket>
-                                    <port>8001</port>
-                                    <bind-address>127.0.0.1</bind-address>
-                                    <shoutcast-mount>/'.$username.'</shoutcast-mount>
-                                </listen-socket> >> /etc/icecast2/icecast.xml');
+
+                    shell_exec('sed -i '.'"65 i\<listen-socket><port>8001</port><shoutcast-mount>/'.$username.'</shoutcast-mount></listen-socket>"'.' /etc/icecast2/icecast.xml');
+
+                    $sql = "CREATE TABLE ".$username." (name varchar(255) NOT NULL, PRIMARY KEY (name))";
+                    mysqli_query($conn,$sql) or die("Algo ha ido mal en la consulta 1");
 
                 header("location: login-user.php");
             } else{
                 echo "Oops! Something went wrong. Please try again later.";
             }
 
-            // Close statement
             mysqli_stmt_close($stmt);
         }
     }
     
-    // Close connection
     mysqli_close($conn);
 }
 ?>

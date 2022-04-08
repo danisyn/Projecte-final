@@ -11,7 +11,6 @@
 	<li class="nav-item has-submenu">
 		<a class="nav-link" href="#"> More menus  </a>
 		<ul class="submenu collapse">
-			<li><a class="nav-link" href="song_register.php">Song register</a></li>
 			<li><a class="nav-link" href="upload_song.php">Upload songs</a></li>
 			<li><a class="nav-link" href="reset-password.php">Reset your password</a></li>
 			<li><a class="nav-link" href="iniciar.php">Inicial playlist</a></li>

@@ -13,7 +13,7 @@
 <h2>Playlist musica clasica</h2>
 
     <audio controls autoplay>  
-      <source src="http://www.radio.com:8001/stream " type="audio/mp3">  
+      <source src="http://www.radio.com:8000/stream " type="audio/mp3">  
     Your browser does not support the html audio tag.  
     </audio> 
 
