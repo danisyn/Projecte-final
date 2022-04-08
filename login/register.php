@@ -83,6 +83,28 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                     // Crear carpeta en /etc/liquidsoap/music/$user
                     shell_exec('mkdir /etc/liquidsoap/music/'.$username);
+                    shell_exec('touch /etc/liquidsoap'.$username.'.liq');
+                    $file = '/etc/liquidsoap/'.$username.'.liq';
+                    $output = 'set("init.allow_root",true)
+                    set("init.daemon.pidfile.path", "/etc/liquidsoap/daemon/pid.txt")
+                    set("init.daemon",true)
+                    %include "crossfade.liq"
+                    myplaylist = playlist(/etc/liquidsoap/'.$username.'.pls)
+                    security = single("/etc/liquidsoap/music/default.mp3")
+                    radio = myplaylist
+                    radio = normalize(radio)
+                    radio = smart_crossfade(start_next=8., fade_in=6., fade_out=6., width=2., conservative=true, radio)
+                    radio = fallback(track_sensitive = false, [radio, security])
+                    output.icecast(%vorbis.cbr(samplerate=44100, channels=2, bitrate=128),host = "localhost", port = 8001, password = "admin", mount = "/'.$username.'",name="My cool webradio name", description="A nice description for my webradio",radio)';
+
+                    $fn = fopen($file,'w');
+                    fwrite($fn,$output);
+                    fclose($fn);
+                    shell_exec(' echo <listen-socket>
+                                    <port>8001</port>
+                                    <bind-address>127.0.0.1</bind-address>
+                                    <shoutcast-mount>/'.$username.'</shoutcast-mount>
+                                </listen-socket> >> /etc/icecast2/icecast.xml');
 
                 header("location: login-user.php");
             } else{

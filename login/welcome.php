@@ -24,5 +24,26 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     </p>
 
 </div>
+
+<div class="col">
+
+<div>
+<h2>Playlist de <?php echo htmlspecialchars($_SESSION["username"]); ?></h2>
+
+    <audio controls autoplay>  
+      <source src="http://www.radio.com:8001/<?php echo htmlspecialchars($_SESSION["username"]); ?>" type="audio/mp3">  
+    Your browser does not support the html audio tag.  
+    </audio> 
+
+    <br>
+    <br>
+
+
+</div>
+
+
+</div>     
+
+
 </body>
 </html>

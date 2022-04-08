@@ -14,7 +14,8 @@
 			<li><a class="nav-link" href="song_register.php">Song register</a></li>
 			<li><a class="nav-link" href="upload_song.php">Upload songs</a></li>
 			<li><a class="nav-link" href="reset-password.php">Reset your password</a></li>
-			<li><a class="nav-link" href="#">Submenu item 7 </a></li>
+			<li><a class="nav-link" href="iniciar.php">Inicial playlist</a></li>
+			<li><a class="nav-link" href="detener.php">Detener playlist</a></li>
 		</ul>
 	</li>
 	<li class="nav-item">
