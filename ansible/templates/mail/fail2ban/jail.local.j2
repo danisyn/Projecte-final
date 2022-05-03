@@ -1,0 +1,15 @@
+[postfix-flood-attack]
+enabled  = true
+bantime  = -1
+filter   = postfix-flood-attack
+action   = iptables-multiport[name=postfix, port="http,https,smtp,submission,pop3,pop3s,imap,imaps,sieve", protocol=tcp]
+logpath  = /var/log/mail.log
+ignoreip = 127.0.0.1/8 ::1 {{ ip }}
+maxretry = 4
+
+[postfix]
+enabled = true
+maxretry = 3
+bantime = 24h
+filter = postfix
+logpath = /var/log/mail.log

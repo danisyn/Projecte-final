@@ -1,0 +1,130 @@
+# See /usr/share/postfix/main.cf.dist for a commented, more complete version
+
+
+# Debian specific:  Specifying a file name will cause the first
+# line of that file to be used as the name.  The Debian default
+# is /etc/mailname.
+#myorigin = /etc/mailname
+
+smtpd_banner = $myhostname ESMTP
+biff = no
+
+# appending .domain is the MUA's job.
+append_dot_mydomain = no
+
+# Uncomment the next line to generate "delayed mail" warnings
+#delay_warning_time = 4h
+
+readme_directory = no
+
+# See http://www.postfix.org/COMPATIBILITY_README.html -- default to 2 on
+# fresh installs.
+compatibility_level = 2
+
+#Deferred mails fix
+maximal_queue_lifetime = 1d
+minimal_backoff_time=300s
+maximal_backoff_time=4000s
+
+# See /usr/share/doc/postfix/TLS_README.gz in the postfix-doc package for
+# information on enabling SSL in the smtp client.
+
+smtpd_sasl_local_domain = $myhostname
+smtpd_sasl_auth_enable = yes
+broken_sasl_auth_clients = yes
+#smtpd_sasl_security_options = noanonymous
+
+#Security options
+disable_vrfy_command = yes
+smtpd_delay_reject = yes
+
+
+#ALL TLS CONFIG
+smtpd_tls_cert_file = /etc/letsencrypt/live/{{ url }}/fullchain.pem
+smtpd_tls_key_file = /etc/letsencrypt/live/{{ url }}/privkey.pem
+smtpd_use_tls=yes
+smtp_tls_security_level = may
+smtpd_tls_security_level = may
+smtp_tls_note_starttls_offer = yes
+smtpd_tls_loglevel = 1
+smtpd_tls_received_header = yes
+smtpd_tls_mandatory_protocols = !TLSv1, !TLSv1.1
+smtpd_tls_protocols = !TLSv1, !TLSv1.1
+
+
+# ACCESS CONTROL CONFIGURATION
+smtpd_client_restrictions =
+	permit_sasl_authenticated
+#	permit_tls_clientcerts
+
+# DISABLE LOCAL MAIL DELIVERY BY SETTING TO EMPTY
+mydestination = localhost
+myorigin = localhost
+
+#local_transport = transport:nexthop
+#transport_maps = hash:/etc/postfix/transport
+
+
+myhostname = mx.syndeno.net
+#alias_maps = hash:/etc/aliases
+#alias_database = hash:/etc/aliases
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+mailbox_size_limit = 0
+recipient_delimiter = +
+inet_interfaces = all
+inet_protocols = ipv4
+relay_domains = hash:/etc/postfix/relaydomains
+
+#virtual_alias_domains = hash:/etc/postfix/virtual_domains
+virtual_alias_maps = hash:/etc/postfix/virtual_maps
+
+
+#Relay restrictions
+
+smtpd_relay_restrictions =
+   permit_sasl_authenticated
+   reject_unauth_destination 
+
+#Reject rules
+
+smtpd_sender_restrictions =
+#   permit_mynetworks
+   permit_sasl_authenticated
+   reject_unauth_destination
+#   reject_unknown_reverse_client_hostname
+#   reject_unknown_client_hostname
+#   reject_unknown_sender_domain
+
+
+#Require HELO/EHLO
+
+smtpd_helo_required = yes
+smtpd_helo_restrictions =
+    permit_sasl_authenticated
+    #reject_invalid_helo_hostname
+    reject_non_fqdn_helo_hostname
+    #reject_unknown_helo_hostname
+
+#Recipient restrictions
+
+smtpd_recipient_restrictions =
+   permit_sasl_authenticated, 
+   reject_unauth_destination
+#   check_recipient_access hash:/etc/postfix/recipient_domains,
+   check_policy_service unix:private/policyd-spf,
+   check_policy_service inet:127.0.0.1:10023,
+   reject_rhsbl_helo dbl.spamhaus.org,
+   reject_rhsbl_reverse_client dbl.spamhaus.org,
+   reject_rhsbl_sender dbl.spamhaus.org,
+   permit_dnswl_client list.dnswl.org=127.0.[0..255].[1..3],  
+   reject_rbl_client zen.spamhaus.org    
+    
+# Milter configuration
+milter_default_action = accept
+milter_protocol = 6
+#smtpd_milters = local:opendkim/opendkim.sock
+non_smtpd_milters = $smtpd_milters
+
+
+smtpd_milters = local:spamass/spamass.sock
+#non_smtpd_milters = $smtpd_milters

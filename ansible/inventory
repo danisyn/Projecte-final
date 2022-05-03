@@ -1,0 +1,7 @@
+[servidor]
+
+[servidor:vars]
+ansible_become=yes
+ansible_user=stream
+ansible_sudo_pass=stream
+ansible_ssh_user=stream

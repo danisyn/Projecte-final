@@ -1,0 +1,334 @@
+- hosts: servidor
+  became: yes
+
+  vars_files:
+  - ./vars/vars.yaml
+
+  tasks:
+
+    - name: Update apt packages
+      apt: 
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 #Un dia 
+
+    - name: Install Icecast2 + Liquidsoap + nginx + mariadb + php
+      apt:
+        name:
+        - icecast2
+        - liquidsoap
+        - nginx
+        - php
+        - mariadb-server
+        - rename
+
+    - name: Copy icecast2 config
+      ansible.builtin.template:
+        src: ./templates/icecast2/icecast.xml.j2
+        dest: /etc/icecast2/icecast.xml
+        owner: www-data
+        group: www-data
+        mode: '0644' 
+
+    - name: Change ownership of liquidsoap
+      shell: 
+        cmd: |
+          mkdir /etc/liquidsoap
+          mkdir /etc/liquidsoap/daemon
+          chown -R www-data:www-data /etc/liquidsoap
+
+    - name: Copy liquidsoap crossfade
+      ansible.builtin.template:
+        src: ./templates/liquidsoap/crossfade.liq.j2
+        dest: /etc/liquidsoap/crossfade.liq
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Copy nginx site
+      ansible.builtin.template:
+        src: ./templates/nginx/radio.j2
+        dest: /etc/nginx/sites-avalible/radio
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Config the nginx site
+      shell:
+        cmd: | 
+          ln -s /etc/nginx/sites-avalible/radio /etc/nginx/sites-enable
+          rm /etc/nginx/sites-enable/default
+          mkdir /var/www/projecte
+          mkdir /var/www/projecte/html
+          ln -s /etc/liquidsoap/music /var/www/projecte/html
+
+    - name: Copy web files
+      copy:
+        src: ./templates/liquidsoap/music
+        dest: /etc/liquidsoap
+        owner: www-data
+        group: www-data
+        mode: '0644'
+
+    - name: Copy web files
+      copy:
+        src: ./templates/web
+        dest: /var/www/projecte
+        owner: www-data
+        group: www-data   
+      
+    - name: Change site owner
+      shell:
+        cmd: | 
+          chown -R www-data:www-data /var/www/projecte
+          chmod -R 744 /var/www/projecte  
+
+    - name: Restart services
+      shell:
+        cmd: | 
+          systemctl restart nginx
+          systemctl restart icecast2  
+
+
+    - name: Start mysql
+      shell:
+        cmd: | 
+          systemctl restart mariadb      
+
+    - name: update mysql root password for all admin accounts  
+      mysql_user:  
+        name: admin  
+        host: "{{ item }}"  
+        password: "{{ mysql_root_password }}"  
+        login_user: admin  
+        login_password: "{{ mysql_root_password }}"  
+        check_implicit_admin: yes  
+        priv: "*.*:ALL,GRANT"  
+        with_items:  
+        - "{{ ansible_hostname }}"  
+        - 127.0.0.1  
+        - ::1  
+        - localhost    
+
+      # mysql_secure_installation
+    - name: Delete anonymous MySQL user
+      mysql_user: name="" host={{ item }} state=absent
+      with_items:
+        - localhost
+        - "{{ ansible_nodename }}"
+
+      # mysql_secure_installation
+    - name: Delete Hostname based MySQL user
+      mysql_user: name=root host="{{ ansible_nodename }}" state=absent
+
+      # mysql_secure_installation
+    - name: Remove MySQL test database
+      mysql_db: name=test state=absent   
+
+    - name: Simple select query to acme db
+      community.mysql.mysql_query:
+        login_host: localhost
+        login_password: '{{ mysql_root_password }}'
+        login_user: passwd
+        query: CREATE SCHEMA music;
+              
+
+    - name: Simple select query to acme db
+      community.mysql.mysql_query:
+        login_db: music
+        login_host: localhost
+        login_password: '{{ mysql_root_password }}'
+        login_user: admin
+        query:
+              CREATE TABLE users (
+                id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                username VARCHAR(50) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP );
+              CREATE TABLE clasicas (name varchar(255) NOT NULL, PRIMARY KEY (name) );
+              CREATE TABLE metal (name varchar(255) NOT NULL, PRIMARY KEY (name) );
+              CREATE TABLE pasodobles (name varchar(255) NOT NULL, PRIMARY KEY (name) );
+
+############ INSTALACION DE SERVIDOR POSTFIX ##############
+
+    - name: Install debconf
+      apt: 
+        name:
+        - debconf-utils    
+
+    - name: Postfix debconf
+      shell: 
+        cmd: |
+          debconf-set-selections <<< "postfix	postfix/main_mailer_type	select	Internet Site"
+          debconf-set-selections <<< "postfix	postfix/mailbox_limit	string	0"
+          debconf-set-selections <<< "postfix	postfix/mailname	string	{{ domain }}"
+          debconf-set-selections <<< "postfix postfix/mynetworks string 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128"
+          debconf-set-selections <<< "postfix	postfix/recipient_delim	string	+"
+      args:
+        executable: /bin/bash    
+
+    - name: Install mail programs
+      apt: 
+        name: 
+        - postfix
+        - libsasl2-modules
+        - postfix-pcre
+        - spamassassin
+        - spamc
+        - spamass-milter
+        - sasl2-bin
+        - postgrey  
+        - pflogsumm 
+        - mutt  
+        - fail2ban
+        - certbot
+        - postfix-policyd-spf-python
+
+#Configuración de los archivos de Postfix
+
+
+    - name: Copy main.cf 
+      ansible.builtin.template:
+        src: ./templates/postfix/main.cf.j2
+        dest: /etc/postfix/main.cf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Copy master.cf 
+      ansible.builtin.template:
+        src: ./templates/postfix/master.cf.j2
+        dest: /etc/postfix/master.cf
+        owner: root
+        group: root
+        mode: '0644'    
+
+    - name: Copy smtpd.conf 
+      ansible.builtin.template:
+        src: ./templates/postfix/smtpd.conf.j2
+        dest: /etc/postfix/sasl/smtpd.conf
+        owner: root
+        group: root
+        mode: '0644'    
+
+    - name: Copy salsauth
+      ansible.builtin.template:
+        src: ./templates/postfix/saslauthd-postfix.j2
+        dest: /etc/default/saslauthd-postfix
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Copy virtual_domains
+      ansible.builtin.template:
+        src: ./templates/postfix/virtual_domains.j2
+        dest: /etc/postfix/virtual_domains
+        owner: root
+        group: root
+        mode: '0644'         
+
+    - name: Copy virtual maps
+      ansible.builtin.template:
+        src: ./templates/postfix/virtual_maps.j2
+        dest: /etc/postfix/virtual_maps
+        owner: root
+        group: root
+        mode: '0644'  
+
+    - name: Copy local.cf
+      ansible.builtin.template:
+        src: ./templates/spamassassin/local.cf.j2
+        dest: /etc/spamassassin/local.cf
+        owner: root
+        group: root
+        mode: '0644' 
+
+
+    - name: Passwd config
+      shell: 
+        cmd: |
+          gpasswd -a postfix opendkim
+          postmap /etc/postfix/virtual_domains
+          postmap /etc/postfix/virtual_maps
+          groupadd -g 5555 spamd
+          useradd -u 5555 -g spamd -s /sbin/nologin -d /usr/local/spamassassin spamd
+          mkdir -p /usr/local/spamassassin/log
+          chown spamd:spamd -R /usr/local/spamassassin
+          systemctl enable spamassassin
+          systemctl start spamassassin
+          /etc/init.d/spamassassin restart
+          rm -rf /run/saslauthd
+          ln -s /var/spool/postfix/var/run/saslauthd   /run/saslauthd
+          dpkg-statoverride --add root sasl 710 /var/spool/postfix/var/run/saslauthd
+          adduser postfix sasl    
+
+    - name: Let's encrypt cert
+      shell: 
+        cmd: |
+          certbot certonly --nginx --standalone --agree-tos -n -d {{ domain }} --email {{ mail_ssl }} --keep-until-expiring
+          
+    - name: Renew TLS certificate
+      ansible.builtin.cron:
+        name:  Renew TLS certificate 
+        special_time: daily
+        job:  certbot renew --quiet  --keep-until-expiring && systemctl reload nginx    
+
+    - name: Let's encrypt cert
+      shell: 
+        cmd: |
+          certbot certonly --standalone --agree-tos -n -d {{ url }} --email {{ mail_ssl }} --keep-until-expiring
+          
+    - name: Renew TLS certificate
+      ansible.builtin.cron:
+        name:  Renew TLS certificate 
+        special_time: daily
+        job:  certbot renew --quiet  --keep-until-expiring && systemctl reload postfix        
+
+    - name: Create user
+      shell: 
+        cmd: | 
+          echo {{ passwd }} | saslpasswd2 -c {{ username }} -u {{ domain }}
+            
+
+#Final de configuración
+
+    - name: Restart Postfix and saslauth
+      shell: 
+         cmd: |
+           /etc/init.d/postfix restart 
+           /etc/init.d/saslauthd  restart
+           
+
+    - name: Start postgrey
+      shell:
+        cmd: |
+          systemctl start postgrey
+          systemctl enable postgrey     
+          
+    - name: Schedule Log report
+      ansible.builtin.cron:
+        name:  Schedule Log report 
+        special_time: daily
+        job: /usr/sbin/pflogsumm -d yesterday /var/log/mail.log --problems-first --rej-add-from --verbose-msg-detail -q | mutt -s "Postfix log summary"  {{ log_address }}
+
+
+    - name: jail.local config
+      ansible.builtin.template:
+        src: ./templates/fail2ban/jail.local.j2
+        dest: /etc/fail2ban/jail.local
+        owner: root
+        group: root
+        mode: '0600'  
+
+    - name: postfix-flood-attack.conf config
+      ansible.builtin.template:
+        src: ./templates/fail2ban/postfix-flood-attack.conf.j2
+        dest: /etc/fail2ban/filter.d/postfix-flood-attack.conf
+        owner: root
+        group: root
+        mode: '0600'   
+
+    - name: Restart fail2ban
+      shell:
+        cmd: |
+          /etc/init.d/fail2ban restart

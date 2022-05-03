@@ -1,0 +1,7 @@
+ip:
+mysql_root_password: password
+domain: soundstream.es
+url: mx.soundstream.es
+mail_ssl: dani.peris2002@gmail.com
+log_address: info@soundstream.es
+max_retry_times: 4
