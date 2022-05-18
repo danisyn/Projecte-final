@@ -32,7 +32,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
                             mysqli_query($conn,$del) or die("Algo ha ido mal en la consulta 0");
 
                             $lines = explode("\n", $salida);
-                            foreach($lines as $line) {
+                            foreach($lines as $line) 
                                 $sql = "insert into ".$_SESSION["username"]." (name) values ('$line')";
                                 $resultado = mysqli_query($conn,$sql) or die("Algo ha ido mal en la consulta 1");
                             }
@@ -47,7 +47,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
                     }
         }
     }
-}
+
 
 
 

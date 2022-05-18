@@ -1,3 +1,4 @@
+
 CREATE SCHEMA music;
 
 CREATE TABLE clasicas (name varchar(255) NOT NULL, PRIMARY KEY (name) );

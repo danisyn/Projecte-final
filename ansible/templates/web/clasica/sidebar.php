@@ -13,13 +13,13 @@
 		</ul>
 	</li>
 	<li class="nav-item">
-		<a class="nav-link" href="../about.php"> About the project </a>
+		<a class="nav-link" href="../about.php"> Acerca del proyecto </a>
 	</li>
 	<li class="nav-item">
-		<a class="nav-link" href="/login/register.php">Register</a>
+		<a class="nav-link" href="/login/register.php">Registrate</a>
 	</li>
 	<li class="nav-item">
-		<a class="nav-link" href="/login/welcome.php">Your home</a>
+		<a class="nav-link" href="/login/welcome.php">Home del usuario</a>
 	</li>
 </ul>
 </nav>

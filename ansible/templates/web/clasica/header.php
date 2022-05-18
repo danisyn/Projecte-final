@@ -79,7 +79,7 @@ height: 40px;
 
 <div class="d-flex justify-content-between nav-align">
 
-<a class="navbar-brand separat " href="#">Final project</a>
+<a class="navbar-brand separat " href="#">Proyecto final</a>
 
 </div>
 
