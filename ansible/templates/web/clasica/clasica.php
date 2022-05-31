@@ -15,7 +15,7 @@
 <br>
 
     <audio controls autoplay>  
-      <source src="http://192.168.1.137:8001/stream " type="audio/mp3">  
+      <source src="http://192.168.56.5:8001/stream " type="audio/mp3">  
     Your browser does not support the html audio tag.  
     </audio> 
 

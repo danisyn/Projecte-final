@@ -12,11 +12,13 @@ $path = '/etc/liquidsoap/music/'.$_SESSION["username"].'/'; //file to place with
 $valid_formats1 = array("mp3"); //list of file extention to be accepted
 if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
     {
+        $pass1 = "1";
         $file1 = $_FILES['file1']['name']; //input file name in this code is file1
         $size = $_FILES['file1']['size'];
 
         if(strlen($file1))
             {
+                $pass2 = "2";
                 list($txt, $ext) = explode(".", $file1);
                 if(in_array($ext,$valid_formats1))
                 {
@@ -32,7 +34,7 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
                             mysqli_query($conn,$del) or die("Algo ha ido mal en la consulta 0");
 
                             $lines = explode("\n", $salida);
-                            foreach($lines as $line) 
+                            foreach($lines as $line) {
                                 $sql = "insert into ".$_SESSION["username"]." (name) values ('$line')";
                                 $resultado = mysqli_query($conn,$sql) or die("Algo ha ido mal en la consulta 1");
                             }
@@ -43,11 +45,13 @@ if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST")
                             header('Location: upload_song.php');
                             }
                         else
+                            echo $pass1;
+                            echo $pass2;
                             echo "failed";              
                     }
         }
     }
-
+}
 
 
 

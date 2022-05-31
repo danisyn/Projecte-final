@@ -16,6 +16,7 @@
 		<ul class="submenu collapse">
 			<li><a class="nav-link" href="upload_song.php">Upload songs</a></li>
 			<li><a class="nav-link" href="reset-password.php">Reset your password</a></li>
+			<li><a class="nav-link" href="deleteuser.php">Delete user</a></li>
 		</ul>
 	</li>
 	<li class="nav-item">

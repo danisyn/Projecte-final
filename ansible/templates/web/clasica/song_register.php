@@ -1,9 +1,9 @@
-<?php include('header.php');?>
+
 <?php include('../base.php');?>
 
 <?php
 
-$salida = shell_exec('clasica');
+$salida = shell_exec("cat /etc/liquidsoap/playlist.pls | awk -F'/' "."'{print".' $NF'."}'");
 
 $del = "delete from clasicas";
 mysqli_query($conn,$del) or die("Algo ha ido mal en la consulta 0");

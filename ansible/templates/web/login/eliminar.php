@@ -13,16 +13,14 @@ include('../base.php');
 $cod = $_GET['name'];
 
  shell_exec('rm /etc/liquidsoap/music/'.$_SESSION["username"].'/'.$cod); 
- 
  shell_exec('find /etc/liquidsoap/music/'.$_SESSION["username"].' -name *.mp3 > /etc/liquidsoap/'.$_SESSION["username"].'.pls');
- $sql = "delete from ".$_SESSION["username"] . " where name = '".$cod."'";
- $resultado = mysqli_query($conn,$sql) or die("Algo ha ido mal en la consulta 1"); 
  $stop = shell_exec("ps -aux | grep liquidsoap/".$_SESSION["username"].".liq | head -n1 | awk"." "."{"."'print $2'"."}");
 
  if($stop === NULL){
 
     header("Location: welcome.php");
-
+    // shell_exec('kill -9'.' '.$stop.'> /dev/null 2>&1 &');
+    
  }else{
 
     shell_exec('kill -9'.' '.$stop.'> /dev/null 2>&1 &');
@@ -32,7 +30,8 @@ $cod = $_GET['name'];
 
  
 
-
+$sql = "delete from ".$_SESSION["username"] . " where name = '".$cod."'";
+$resultado = mysqli_query($conn,$sql) or die("Algo ha ido mal en la consulta 1"); 
 if ($resultado == true){
 
         header("Location: welcome.php");

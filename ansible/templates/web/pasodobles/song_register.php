@@ -3,7 +3,7 @@
 
 <?php
 
-$salida = shell_exec('paso');
+$salida = shell_exec("cat /etc/liquidsoap/pasodobles.pls | awk -F'/' "."'{print".' $NF'."}'");
 echo "<pre>$salida</pre>";
 
 $del = "delete from pasodobles";

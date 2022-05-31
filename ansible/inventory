@@ -1,8 +1,8 @@
 [servidor]
-94.73.72.13
+192.168.56.5
 
 [servidor:vars]
 ansible_become=yes
-ansible_user=stream
-ansible_sudo_pass=stream
-ansible_ssh_user=stream
+ansible_user=ubuntu
+ansible_sudo_pass=ubuntu
+ansible_ssh_user=ubuntu

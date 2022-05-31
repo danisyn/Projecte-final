@@ -9,15 +9,15 @@
       content="Mark Otto, Jacob Thornton, and Bootstrap contributors"
     />
     <meta name="generator" content="Hugo 0.88.1" />
-    <title>Log IN</title>
+    <title>Centro de administración- <?php echo htmlspecialchars($_SESSION["username"]); ?></title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css">
-    <link rel="icon" type="image/x-icon" href="http://www.radio.com:8080/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="http://soundstream.es:80/favicon.ico" />
     <script src="funciones.js"></script>
 
-    
+
 
     <style>
 
@@ -37,6 +37,48 @@
     color: var(--bs-primary);
 }
 
+.separat {
+
+  margin-left: 1%;
+
+
+}
+
+.custom-nav{
+
+  border: 1px solid rgba(0,0,0,.125);
+  background-color: #fff;
+  margin: 1%
+
+}
+
+.nav-align{
+
+  padding-left: 1%;
+  padding-right: 1%;
+}
+
+img {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+
+.td1{
+
+  width: 50%;
+
+}
+
+.td2{
+
+  width: 100px;
+
+}
+
+.arreglar{
+  width: 20%;
+}
 
 
 
@@ -47,20 +89,36 @@
 
 
     <script src="../sidebar.js"></script>
-    <script src="ecualizer.js"></script>
    
   </head>
 
   <body class="bg-light">
 
-  <header class="section-header py-3">
-    <div class="container-fluid">
+  <nav class="navbar navbar-light  custom-nav">
 
-    </div>
-</header>
+  <div class="d-flex justify-content-between nav-align">
 
-<div class="col-lg-7">
+  <a class="navbar-brand separat " href="welcome.php">Centro de administración</a>
 
-<section class="section-content py-3">
-	<div class="row">
-		<aside class="col-lg-3"> 
+  </div>
+
+  <div class="d-flex justify-content-between nav-align">
+
+  <img src="avatar.png" alt="Avatar">
+
+</div>
+
+  </nav>
+
+
+  <div class="row g-3">
+
+
+
+  
+
+
+
+
+
+

@@ -18,11 +18,28 @@
 
 # Default server configuration
 #
+#server {
+#        server_name local.website.dev;
+#        rewrite ^(.*) https://soundstream.es$1 permanent;
+#}
 server {
-        listen 8080;
-        server_name www.pagina.com;
+
+listen 80;
+#listen 443;
+#ssl on;
+#ssl_certificate      /etc/nginx/localhost.crt;
+#ssl_certificate_key  /etc/nginx/localhost.key;
+#ssl_ciphers          HIGH:!aNULL:!MD5;
+
+        server_name soundstream.es;
         root /var/www/projecte/web;
         index index.php;
+        disable_symlinks off;
+
+
+
+
+
 location ~ \.php$ {
  include snippets/fastcgi-php.conf;
  #With php-fpm (or other unix sockets):

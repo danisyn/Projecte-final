@@ -7,6 +7,10 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: login-user.php");
     exit;
 }
+
+if($_SESSION["username"] == "admin"){
+    header("location: admin.php");
+};
 ?>
  
 
@@ -30,7 +34,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
 
     <audio controls>  
-      <source src="http://www.radio.com:8001/<?php echo htmlspecialchars($_SESSION["username"]); ?>" type="audio/mp3">  
+      <source src="http://192.168.56.5:8001/<?php echo htmlspecialchars($_SESSION["username"]); ?>" type="audio/mp3">  
     Your browser does not support the html audio tag.  
     </audio> 
 
@@ -38,8 +42,8 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
     <br>
 
-    <a href="iniciar.php"><button class='btn btn-primary'>Start playlist</button></a>
-    <a href="detener.php"><button class='btn btn-danger'>Stop playlist</button></a>
+    <a href="iniciar.php"><button class='btn btn-primary'>Iniciar playlist</button></a>
+    <a href="detener.php"><button class='btn btn-danger'>Detener playlist</button></a>
 
     <br>
 </div>
@@ -92,7 +96,6 @@ $resultado = mysqli_query($conn,$sql) or die("Algo ha ido mal en la consulta");
 
         </div>
         </div>
-
 
 
     

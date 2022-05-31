@@ -7,7 +7,7 @@
 
 
 <form enctype="multipart/form-data" id="form1" method="post" action="upload.php">
-<input class="form-control form-control-lg" id="formFileLg" type="file" name="file1" accept=".ogg,.flac,.mp3" required="required"/>
+<input class="form-control form-control-lg" id="formFileLg" type="file" name="file1" accept=".mp3" required="required"/>
 <input class="form-control form-control-lg" id="formFileLg" type="submit" name="submit"/>
 </form>
 

@@ -15,7 +15,7 @@
 <br>
 
     <audio controls class="reproductor" autoplay>  
-      <source src="http://192.168.1.137:8001/metal" type="audio/mp3">  
+      <source src="http://192.168.56.5:8001/metal" type="audio/mp3">  
     Your browser does not support the html audio tag.  
     </audio>  
 
@@ -45,7 +45,7 @@
 
 <?php
 
-$sql = "select * from canciones";
+$sql = "select * from metal";
 $resultado = mysqli_query($conn,$sql) or die("Algo ha ido mal en la consulta"); 
 
 
